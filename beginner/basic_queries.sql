@@ -60,7 +60,7 @@ SELECT
 FROM 
     job_postings_fact
 ORDER BY
-    job_location
+    job_location;
 
 
 
@@ -80,6 +80,5 @@ FROM
 WHERE
     job_title_short ='Data Engineer'
 ORDER BY
-    job_id ASC  
+    job_id ASC  ;
 
--

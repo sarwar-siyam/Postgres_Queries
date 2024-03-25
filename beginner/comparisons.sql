@@ -15,7 +15,7 @@ FROM
 WHERE 
     job_location = 'Tampa, FL'
 ORDER BY 
-    job_id ASC
+    job_id ASC;
 
 
 /*
@@ -36,7 +36,7 @@ FROM
 WHERE
     job_schdule_type = 'Full-time'
 ORDER BY 
-    job_id ASC
+    job_id ASC;
 
 
 /*
@@ -56,7 +56,7 @@ FROM
 WHERE
     job_schdule_type !='Part-time'
 ORDER BY    
-    job_id ASC
+    job_id ASC;
 
 
 /*
@@ -76,7 +76,7 @@ FROM
 WHERE 
     job_via!= 'via LinkedIn'
 ORDER BY
-    job_id ASC
+    job_id ASC;
 
 
 
@@ -96,7 +96,7 @@ FROM
 WHERE 
     salary_year_avg >= 65000
 ORDER BY 
-    job_id
+    job_id;
 
 
 /*
@@ -117,7 +117,7 @@ FROM
 WHERE
     job_title_short = 'Data Engineer' and job_location = 'United States'
 ORDER BY
-    job_id ASC
+    job_id ASC;
 
 
 /*
@@ -139,7 +139,7 @@ FROM
 WHERE
     job_schdule_type = 'Full-Time' OR job_schdule_type = 'Contractor'
 ORDER BY 
-    job_id 
+    job_id;
 
 
 
@@ -161,7 +161,7 @@ FROM
 WHERE 
     salary_year_avg >= 55000 AND salary_year_avg <= 70000
 ORDER BY 
-    job_id
+    job_id;
 
 
 
@@ -176,7 +176,7 @@ FROM
 WHERE 
     salary_year_avg between 55000 AND  70000
 ORDER BY 
-    job_id
+    job_id;
 
 
 
@@ -197,7 +197,7 @@ FROM
 WHERE 
     job_title_short in ('Data Analyst', 'Data Scientist', 'Business Analyst')
 ORDER BY
-    job_id
+    job_id;
 
 
 /* 
@@ -217,7 +217,7 @@ FROM
 WHERE
     job_title_short = 'Data Analyst' AND salary_year_avg  BETWEEN 50000 AND 70000
 ORDER BY 
-        job_id
+        job_id;
 
 
 /* 
@@ -240,6 +240,5 @@ WHERE
     job_title_short in('Data Analyst', 'Business Analyst')
     AND salary_year_avg > 75000
 ORDER BY
-    job_id
+    job_id;
 
--

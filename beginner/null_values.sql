@@ -9,7 +9,7 @@ SELECT
 FROM 
 	skills_dim 
 Where
-	type is null 
+	type is null;
 
 
 /*
@@ -27,6 +27,5 @@ FROM
 	job_postings_fact
 WHERE
 	salary_year_avg IS NULL AND salary_year_avg IS NULL
-ORDER BY job_id
+ORDER BY job_id;
 
--

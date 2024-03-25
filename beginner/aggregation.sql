@@ -56,7 +56,7 @@ WHERE
 SELECT min(salary_year_avg) as minimum_yearly_salary,
 max(salary_year_avg) as maximum_yearly_salary
 FROM job_postings_fact
-WHERE job_location like ('%San Francisco%') and salary_year_avg IS NOT NULL
+WHERE job_location like ('%San Francisco%') and salary_year_avg IS NOT NULL;
 
 
 /*
@@ -73,7 +73,7 @@ FROM
 WHERE
 	
 	salary_year_avg IS NOT NULL
-	AND job_title = 'Data Scientist'
+	AND job_title = 'Data Scientist';
 
 
 
@@ -112,7 +112,7 @@ WHERE
 GROUP BY
 	job_country 
 HAVING 
-	AVG(salary_year_avg) > 100000
+	AVG(salary_year_avg) > 100000;
 
 
 /*
@@ -134,9 +134,8 @@ GROUP BY
 HAVING 
 	AVG(salary_year_avg) > 70000
 ORDER BY
-	count(job_id) DESC
+	count(job_id) DESC;
 	
 
 
 
--

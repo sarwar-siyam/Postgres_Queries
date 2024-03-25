@@ -12,7 +12,7 @@ FROM
 WHERE 
     name like ('%Tech_')
 ORDER BY 
-    name
+    name;
 
 
 
@@ -31,9 +31,8 @@ FROM
 WHERE
     job_title LIKE ('%a_a%')
 ORDER BY
-    job_id
+    job_id;
 
 
 
 
--

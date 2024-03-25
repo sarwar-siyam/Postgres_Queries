@@ -19,7 +19,7 @@ ON job_postings_fact.company_id = company_dim.company_id
 WHERE
 	job_title_short = 'Data Scientist'
 ORDER BY
-	job_posted_date DESC
+	job_posted_date DESC;
 
 
 
@@ -71,4 +71,3 @@ GROUP BY
 ORDER BY 
     count_of_jobs DESC;
 
--
