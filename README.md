@@ -1,201 +1,222 @@
-# Introduction
+# Arbeitsmarktanalyse für Data Analysts mit PostgreSQL
 
-Tauche ein in den Daten-Arbeitsmarkt! Mit Fokus auf Datenanalystenrollen erkundet dieses Projekt die 💰 Top-verdienenden Jobs, 🔥 gefragten Fähigkeiten und 📈 wo hohe Nachfrage auf hohe Gehälter im Bereich Datenanalytik trifft.
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-CC2927?logoColor=white)
+![VS Code](https://img.shields.io/badge/VS%20Code-007ACC?logo=visualstudiocode&logoColor=white)
 
-🔍 SQL queries? Findest du hier: [beginner](/beginner/) und hier [advance](/advance/)
+Welche Data-Analyst-Jobs zahlen am besten – und welche Skills lohnen sich wirklich?
+In diesem Projekt analysiere ich Stellenanzeigen aus dem Jahr 2023 mit PostgreSQL und leite daraus ab,
+welche Fähigkeiten **sowohl stark nachgefragt als auch gut bezahlt** sind.
 
-# Backround
+---
 
-Getrieben von dem Wunsch, den Datenanalysten-Arbeitsmarkt effektiver zu durchqueren, entstand dieses Projekt aus dem Verlangen, Top-verdienende und gefragte Fähigkeiten zu identifizieren und die Arbeit anderer zu optimieren, um optimale Jobs zu finden.
+## Inhalt
 
-Er ist randvoll mit Einblicken in Stellentitel, Gehälter, Standorte und wesentliche Fähigkeiten.
+- [Fragestellungen](#fragestellungen)
+- [Datenmodell](#datenmodell)
+- [Projektstruktur](#projektstruktur)
+- [Analyse & Ergebnisse](#analyse--ergebnisse)
+- [Fazit](#fazit)
+- [Eingesetzte SQL-Techniken](#eingesetzte-sql-techniken)
 
-Die Fragen, die ich durch meine SQL-Abfragen beantworten wollte, waren:
+---
 
-1. Welche sind die am besten bezahlten Datenanalysten-Jobs?
-2. Welche Fähigkeiten werden für diese Top-verdienenden Jobs benötigt?
-3. Welche Fähigkeiten sind am gefragtesten für Datenanalysten?
-4. Welche Fähigkeiten sind mit höheren Gehältern verbunden?
-5. Welche sind die optimalsten Fähigkeiten zum Lernen?
+## Fragestellungen
 
-# Tools I Used
-Für meine intensive Untersuchung des Datenanalysten-Arbeitsmarktes habe ich folgende Werkzeuge genutzt:
+1. Welche Data-Analyst-Jobs (remote) sind am besten bezahlt?
+2. Welche Skills verlangen diese Top-Jobs?
+3. Welche Skills werden insgesamt am häufigsten nachgefragt?
+4. Welche Skills sind mit den höchsten Gehältern verbunden?
+5. Welche Skills sind **optimal zu lernen** – hohe Nachfrage *und* hohes Gehalt?
 
-- SQL: Das Rückgrat meiner Analyse, das es mir ermöglicht, die Datenbank abzufragen und wichtige Erkenntnisse zu gewinnen.
-- PostgreSQL: Das ausgewählte Datenbankmanagementsystem, ideal für die Verarbeitung der Stellenangebotsdaten.
-- Visual Studio Code: Mein Favorit für das Datenbankmanagement und die Ausführung von SQL-Abfragen.
-- Git & GitHub: Unverzichtbar für die Versionskontrolle und das Teilen meiner SQL-Skripte und Analysen, um Zusammenarbeit und Projektverfolgung sicherzustellen.
-# The Analysis
+## Datenmodell
 
-Jede Abfrage für dieses Projekt hatte das Ziel, spezifische Aspekte des Datenanalysten-Arbeitsmarktes zu untersuchen. Hier ist, wie ich jede Frage angegangen bin:
+Die Daten sind als **Sternschema** aufgebaut:
 
-## 1. Top-verdienende Datenanalysten-Jobs
-Um die am besten bezahlten Rollen zu identifizieren, habe ich Datenanalystenpositionen nach durchschnittlichem Jahresgehalt und Standort gefiltert, wobei ich mich auf Remote-Jobs konzentrierte. Diese Abfrage hebt die hoch bezahlten Möglichkeiten im Bereich hervor.
-
-```sql
-SELECT	
-	job_id,
-	job_title,
-	job_location,
-	job_schedule_type,
-	salary_year_avg,
-	job_posted_date,
-    name AS company_name
-FROM
-    job_postings_fact
-LEFT JOIN company_dim ON job_postings_fact.company_id = company_dim.company_id
-WHERE
-    job_title_short = 'Data Analyst' AND 
-    job_location = 'Anywhere' AND 
-    salary_year_avg IS NOT NULL
-ORDER BY
-    salary_year_avg DESC
-LIMIT 10;
+```
+                 ┌──────────────┐
+                 │ company_dim  │
+                 └──────┬───────┘
+                        │ company_id
+┌──────────────┐  ┌─────┴─────────────┐  ┌──────────────┐
+│  skills_dim  ├──┤  skills_job_dim   ├──┤ job_postings │
+│              │  │ (Brückentabelle)  │  │    _fact     │
+└──────────────┘  └───────────────────┘  └──────────────┘
 ```
 
+| Tabelle | Inhalt |
+|---|---|
+| `job_postings_fact` | Stellenanzeigen mit Titel, Ort, Remote-Option, Gehalt, Datum |
+| `company_dim` | Arbeitgeber |
+| `skills_dim` | Skills und Skill-Kategorie |
+| `skills_job_dim` | Verknüpfung Stellenanzeige ↔ Skill (n:m) |
 
-Hier ist die Aufschlüsselung der Top-Datenanalysten-Jobs im Jahr 2023:
+## Projektstruktur
 
-- Weites Gehaltsspektrum: Die Top 10 bezahlten Datenanalysten-Jobs reichen von $184.000 bis $650.000, was auf ein erhebliches Gehaltspotenzial in diesem Bereich hinweist.
+```
+├── create_tables/   Tabellen, Indizes, Laden der CSV-Daten, Monatstabellen
+├── beginner/        Grundlagen: SELECT, Filter, JOINs, Aggregation, NULL-Werte
+├── advanced/        CTEs, Subqueries, CASE, UNION, Datumsfunktionen, DDL/DML
+└── assets/          Visualisierungen der Ergebnisse
+```
 
-- Vielfältige Arbeitgeber: Unternehmen wie SmartAsset, Meta und AT&T gehören zu denen, die hohe Gehälter anbieten, was ein breites Interesse über verschiedene Branchen hinweg zeigt.
+---
 
-- Vielfalt an Jobtiteln: Es gibt eine hohe Vielfalt an Jobtiteln, von Datenanalyst bis zum Leiter der Analytik, was die vielfältigen Rollen und Spezialisierungen innerhalb der Datenanalytik widerspiegelt
+## Analyse & Ergebnisse
 
-![Alt top](/assets/Bildschirmfoto%202024-03-27%20um%2013.06.44.png)
+### 1. Bestbezahlte Data-Analyst-Jobs (remote)
 
+Gefiltert auf Data-Analyst-Rollen mit Remote-Option und angegebenem Jahresgehalt, sortiert nach Gehalt.
 
-### 2 Fähigkeiten für die bestbezahlten Jobs
-Um zu verstehen, welche Fähigkeiten für die am besten bezahlten Jobs erforderlich sind, habe ich die Stellenanzeigen mit den Fähigkeitsdaten verbunden, um Einblicke darüber zu erhalten, was Arbeitgeber für hochbezahlte Positionen wertschätzen.
+<details>
+<summary>SQL anzeigen</summary>
+
+```sql
+SELECT
+    job_id,
+    job_title,
+    job_location,
+    job_schedule_type,
+    salary_year_avg,
+    job_posted_date,
+    name AS company_name
+FROM job_postings_fact
+LEFT JOIN company_dim ON job_postings_fact.company_id = company_dim.company_id
+WHERE job_title_short = 'Data Analyst'
+  AND job_location = 'Anywhere'
+  AND salary_year_avg IS NOT NULL
+ORDER BY salary_year_avg DESC
+LIMIT 10;
+```
+</details>
+
+**Ergebnis**
+- Die Top-10-Gehälter reichen von **184.000 $ bis 650.000 $** pro Jahr.
+- Die Jobtitel sind sehr unterschiedlich – vom Data Analyst bis zur Leitung Analytics.
+- Hohe Gehälter werden branchenübergreifend gezahlt.
+
+![Bestbezahlte Data-Analyst-Jobs](assets/01_top_bezahlte_jobs.png)
+
+### 2. Skills der bestbezahlten Jobs
+
+Die Top-10-Jobs werden per CTE ermittelt und mit den Skill-Tabellen verknüpft.
+
+<details>
+<summary>SQL anzeigen</summary>
 
 ```sql
 WITH top_paying_jobs AS (
-    SELECT	
-        job_id,
-        job_title,
-        salary_year_avg,
-        name AS company_name
-    FROM
-        job_postings_fact
+    SELECT job_id, job_title, salary_year_avg, name AS company_name
+    FROM job_postings_fact
     LEFT JOIN company_dim ON job_postings_fact.company_id = company_dim.company_id
-    WHERE
-        job_title_short = 'Data Analyst' AND 
-        job_location = 'Anywhere' AND 
-        salary_year_avg IS NOT NULL
-    ORDER BY
-        salary_year_avg DESC
+    WHERE job_title_short = 'Data Analyst'
+      AND job_location = 'Anywhere'
+      AND salary_year_avg IS NOT NULL
+    ORDER BY salary_year_avg DESC
     LIMIT 10
 )
-
-SELECT 
-    top_paying_jobs.*,
-    skills
+SELECT top_paying_jobs.*, skills
 FROM top_paying_jobs
 INNER JOIN skills_job_dim ON top_paying_jobs.job_id = skills_job_dim.job_id
-INNER JOIN skills_dim ON skills_job_dim.skill_id = skills_dim.skill_id
-ORDER BY
-    salary_year_avg DESC;
-
+INNER JOIN skills_dim     ON skills_job_dim.skill_id = skills_dim.skill_id
+ORDER BY salary_year_avg DESC;
 ```
-Hier ist die Aufschlüsselung der am meisten nachgefragten Fähigkeiten für die 10 bestbezahlten Datenanalysten-Jobs im Jahr 2023:
+</details>
 
-- SQL führt mit einer deutlichen Anzahl von 8.
-- Python folgt dicht dahinter mit einer deutlichen Anzahl von 7.
-- Tableau ist ebenfalls sehr gefragt, mit einer deutlichen Anzahl von 6. Andere Fähigkeiten wie R, Snowflake, Pandas und Excel zeigen unterschiedliche Grade der Nachfrage.
+**Ergebnis**
 
-![Fähigkeiten für die am besten bezahlten Jobs](/assets/Bildschirmfoto%202024-03-27%20um%2013.28.08.png)
+| Skill | Nennungen in den Top-10-Jobs |
+|---|---|
+| SQL | 8 |
+| Python | 7 |
+| Tableau | 6 |
 
+Weitere Skills: R, Snowflake, Pandas, Excel.
 
-### 3 Gefragte Fähigkeiten für Datenanalysten
+![Skills der bestbezahlten Jobs](assets/02_skills_top_jobs.png)
 
-Diese Abfrage half dabei, die am häufigsten angeforderten Fähigkeiten in Stellenanzeigen zu identifizieren und lenkte den Fokus auf Bereiche mit hoher Nachfrage.
+### 3. Die gefragtesten Skills
+
+<details>
+<summary>SQL anzeigen</summary>
 
 ```sql
-SELECT 
+SELECT
     skills,
     COUNT(skills_job_dim.job_id) AS demand_count
 FROM job_postings_fact
 INNER JOIN skills_job_dim ON job_postings_fact.job_id = skills_job_dim.job_id
-INNER JOIN skills_dim ON skills_job_dim.skill_id = skills_dim.skill_id
-WHERE
-    job_title_short = 'Data Analyst' 
-    AND job_work_from_home = True 
-GROUP BY
-    skills
-ORDER BY
-    demand_count DESC
+INNER JOIN skills_dim     ON skills_job_dim.skill_id = skills_dim.skill_id
+WHERE job_title_short = 'Data Analyst'
+  AND job_work_from_home = TRUE
+GROUP BY skills
+ORDER BY demand_count DESC
 LIMIT 5;
 ```
+</details>
 
-Hier ist die Aufschlüsselung der am meisten nachgefragten Fähigkeiten für Datenanalysten im Jahr 2023:
+**Ergebnis**
+- **SQL und Excel** bleiben die Basis – Datenverarbeitung und Tabellenkalkulation sind Pflicht.
+- **Python, Tableau und Power BI** folgen – Programmierung und Visualisierung gewinnen an Bedeutung.
 
-SQL und Excel bleiben grundlegend, was die Notwendigkeit starker Grundlagenkenntnisse in der Datenverarbeitung und Tabellenkalkulation hervorhebt.
+![Gefragteste Skills](assets/03_gefragteste_skills.png)
 
-Programmier- und Visualisierungswerkzeuge wie Python, Tableau und Power BI sind unverzichtbar und weisen auf die zunehmende Bedeutung technischer Fähigkeiten in der Datenvisualisierung und Entscheidungsunterstützung hin.
+### 4. Optimale Skills: Nachfrage × Gehalt
 
-![](/assets/Bildschirmfoto%202024-03-27%20um%2013.32.51.png)
+Kombination aus Nachfrage (mehr als 10 Stellenanzeigen) und durchschnittlichem Gehalt.
 
-
-#### 4 Die optimalsten Fähigkeiten zum Lernen
-
-Durch die Kombination von Erkenntnissen aus Nachfrage- und Gehaltsdaten hatte diese Abfrage zum Ziel, Fähigkeiten zu identifizieren, die sowohl eine hohe Nachfrage als auch hohe Gehälter aufweisen. Dadurch wird ein strategischer Fokus für die Weiterentwicklung von Fähigkeiten geboten.
+<details>
+<summary>SQL anzeigen</summary>
 
 ```sql
-SELECT 
+SELECT
     skills_dim.skill_id,
     skills_dim.skills,
-    COUNT(skills_job_dim.job_id) AS demand_count,
+    COUNT(skills_job_dim.job_id)                 AS demand_count,
     ROUND(AVG(job_postings_fact.salary_year_avg), 0) AS avg_salary
 FROM job_postings_fact
 INNER JOIN skills_job_dim ON job_postings_fact.job_id = skills_job_dim.job_id
-INNER JOIN skills_dim ON skills_job_dim.skill_id = skills_dim.skill_id
-WHERE
-    job_title_short = 'Data Analyst'
-    AND salary_year_avg IS NOT NULL
-    AND job_work_from_home = True 
-GROUP BY
-    skills_dim.skill_id
-HAVING
-    COUNT(skills_job_dim.job_id) > 10
-ORDER BY
-    avg_salary DESC,
-    demand_count DESC
+INNER JOIN skills_dim     ON skills_job_dim.skill_id = skills_dim.skill_id
+WHERE job_title_short = 'Data Analyst'
+  AND salary_year_avg IS NOT NULL
+  AND job_work_from_home = TRUE
+GROUP BY skills_dim.skill_id
+HAVING COUNT(skills_job_dim.job_id) > 10
+ORDER BY avg_salary DESC, demand_count DESC
 LIMIT 25;
 ```
+</details>
 
-![](/assets/Bildschirmfoto%202024-03-27%20um%2013.36.38.png)
+**Ergebnis**
 
+| Bereich | Beobachtung |
+|---|---|
+| Programmiersprachen | Python (Nachfrage 236, Ø ~101.400 $) und R (148, Ø ~100.500 $) – sehr gefragt, aber weit verbreitet |
+| Cloud & Big Data | Snowflake, Azure, AWS und BigQuery – solide Nachfrage bei überdurchschnittlichen Gehältern |
+| BI & Visualisierung | Tableau (230, Ø ~99.300 $) und Looker (49, Ø ~103.800 $) |
+| Datenbanken | Oracle, SQL Server, NoSQL – Ø zwischen ~97.800 $ und ~104.500 $ |
 
+![Optimale Skills](assets/04_optimale_skills.png)
 
-Hier ist eine Aufschlüsselung der optimalsten Fähigkeiten für Datenanalysten im Jahr 2023:
+---
 
-- Programmiersprachen mit hoher Nachfrage: Python und R zeichnen sich durch ihre hohe Nachfrage aus, mit Nachfragezahlen von 236 bzw. 148. Trotz ihrer hohen Nachfrage liegen ihre durchschnittlichen Gehälter bei etwa $101,397 für Python und $100,499 für R, was darauf hindeutet, dass die Beherrschung dieser Sprachen zwar sehr geschätzt wird, aber auch weit verbreitet ist.
+## Fazit
 
-- Cloud-Tools und -Technologien: Fähigkeiten in spezialisierten Technologien wie Snowflake, Azure, AWS und BigQuery zeigen eine signifikante Nachfrage mit relativ hohen Durchschnittsgehältern, was auf die wachsende Bedeutung von Cloud-Plattformen und Big-Data-Technologien in der Datenanalyse hinweist.
+1. **SQL ist der wichtigste Skill** – am häufigsten nachgefragt und in den bestbezahlten Jobs am stärksten vertreten.
+2. **Python und ein BI-Tool** (Tableau oder Power BI) sind die logische Ergänzung.
+3. **Cloud-Kenntnisse** (Azure, Snowflake, AWS) heben das Gehaltsniveau spürbar an.
+4. Sehr spezialisierte Skills erzielen die höchsten Durchschnittsgehälter, sind aber selten gefragt.
 
-- Business-Intelligence- und Visualisierungstools: Tableau und Looker mit Nachfragezahlen von 230 bzw. 49 und durchschnittlichen Gehältern von rund $99,288 bzw. $103,795 betonen die entscheidende Rolle der Datenvisualisierung und Business Intelligence bei der Ableitung handlungsorientierter Erkenntnisse aus Daten.
+## Eingesetzte SQL-Techniken
 
-- Datenbanktechnologien: Die Nachfrage nach Fähigkeiten in traditionellen und NoSQL-Datenbanken (Oracle, SQL Server, NoSQL) mit durchschnittlichen Gehältern von $97,786 bis $104,534 reflektiert den anhaltenden Bedarf an Fachwissen für Daten speicherung, abruf und management
+| Technik | Wo |
+|---|---|
+| `CREATE TABLE`, Primär- & Fremdschlüssel, Indizes | `create_tables/` |
+| `JOIN`s (INNER / LEFT) über ein Sternschema | Analysen 1–4 |
+| Aggregation mit `GROUP BY`, `HAVING`, `COUNT`, `AVG` | Analysen 3–4 |
+| CTEs (`WITH`) und Subqueries | Analyse 2, `advanced/` |
+| `CASE`, `UNION`, Datumsfunktionen | `advanced/` |
 
-# What I Learned
+---
 
-Während dieses Abenteuers habe ich meine SQL-Toolbox mit ernsthafter Schlagkraft aufgeladen:
-
-🧩 Komplexe Abfragen gestalten: Meisterte die Kunst fortgeschrittener SQL-Abfragen, indem ich Tabellen wie ein Profi zusammenführte und WITH-Klauseln für temporeiche Tabellenmanöver einsetzte.
-
-📊 Datenaggregation: Wurde vertraut mit GROUP BY und verwandelte aggregierte Funktionen wie COUNT() und AVG() in meine datenzusammenfassenden Helferlein.
-
-💡 Analytische Zauberkunst: Habe meine Fähigkeiten im Lösen realer Probleme aufgewertet, indem ich Fragen in handlungsorientierte, aufschlussreiche SQL-Abfragen umwandelte.
-
-# Conclusions
-Aus der Analyse ergaben sich mehrere allgemeine Erkenntnisse:
-
-Top-bezahlte Datenanalysten-Jobs: Die bestbezahlten Jobs für Datenanalysten, die Remote-Arbeit ermöglichen, bieten eine breite Palette von Gehältern, das höchste bei $650.000!
-
-Fähigkeiten für Top-bezahlte Jobs: Hoch bezahlte Datenanalysten-Jobs erfordern fortgeschrittene Kenntnisse in SQL, was darauf hindeutet, dass es eine entscheidende Fähigkeit ist, um ein Top-Gehalt zu verdienen.
-
-Am meisten nachgefragte Fähigkeiten: SQL ist auch die am meisten nachgefragte Fähigkeit auf dem Datenanalysten-Arbeitsmarkt, was es für Jobsuchende unverzichtbar macht.
-
-Fähigkeiten mit höheren Gehältern: Spezialisierte Fähigkeiten wie SVN und Solidity sind mit den höchsten durchschnittlichen Gehältern verbunden, was auf einen Premium für Fachkenntnisse hinweist.
-
-Optimale Fähigkeiten für den Marktwert: SQL führt in der Nachfrage und bietet ein hohes Durchschnittsgehalt, was es zu einer der optimalsten Fähigkeiten für Datenanalysten macht, um ihren Marktwert zu maximieren.
+**Autor:** Sarwar Siyam Aghbar · [Portfolio](https://sarwar-siyam.github.io/ProWebsite/) · [LinkedIn](https://www.linkedin.com/in/siyam-aghbar-1a1a46248/)
